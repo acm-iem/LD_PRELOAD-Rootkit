@@ -3,8 +3,16 @@
 ![made-with-C](https://shields.io/badge/Made_With-C-green?logo=Linux&style=for-the-badge)
 
 ## How To Compile It ?
-
-```gcc smoochum.c -fPIC -shared -D_GNU_SOURCE -o libc.man.so.6 -ldl```
+- Using Makefile
+```bash
+$ git clone https://github.com/acm-iem/LD_PRELOAD-Rootkit
+$ cd LD_PRELOAD-Rootkit
+$ make
+```
+- Using GCC
+```bash
+$ gcc smoochum.c -fPIC -shared -D_GNU_SOURCE -o libc.man.so.6 -ldl
+```
 
 Let's break down the command :
 - ```gcc``` : Our very own **GNU Compiler Collection**
